@@ -16,7 +16,7 @@ def ExtraTreesClassification(data_x, data_y, folds, output_graph = "graph/Extra-
         os.makedirs(output_graph)
 
     for n_splits in folds:
-        kfold = KFold(n_splits=n_splits, shuffle=True, random_state=1)
+        kfold = KFold(n_splits=n_splits, shuffle=True)
 
         confmat = []
         accuracy = []
