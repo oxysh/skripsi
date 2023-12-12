@@ -59,33 +59,41 @@ data_x_transformed = ExtraTreesFeatureSelection(data_x, data_y)
 # KFold
 folds = [4, 5, 10]
 
-# SVM
+# SVM Kernel
 kernels = ["linear", "poly", "rbf", "sigmoid"]
-df_SVM = SVMClassification(data_x_transformed, data_y, folds, kernels)
 
-# Extra-Trees
-df_ExtraTrees = ExtraTreesClassification(data_x_transformed, data_y, folds)
+writer = pd.ExcelWriter("result.xlsx")
+for i in range(2):
+    print('\n--- Iterasi ' + str(i+1) + " ---")
 
-# Merge df
-df = pd.concat([df_SVM, df_ExtraTrees], axis=1)
-df = df.rename(index={
-    0: "4 fold_accuracy",
-    1: "4 fold_precision",
-    2: "4 fold_specificity",
-    3: "4 fold_recall",
-    4: "4 fold_err_rate",
-    5: "5 fold_accuracy",
-    6: "5 fold_precision",
-    7: "5 fold_specificity",
-    8: "5 fold_recall",
-    9: "5 fold_err_rate",
-    10: "10 fold_accuracy",
-    11: "10 fold_precision",
-    12: "10 fold_specificity",
-    13: "10 fold_recall",
-    14: "10 fold_err_rate"
-})
+    # SVM
+    df_SVM = SVMClassification(data_x_transformed, data_y, folds, kernels)
 
-# Export to excel
-with pd.ExcelWriter("result.xlsx") as writer:
-    df.to_excel(writer, sheet_name="main")
+    # Extra-Trees
+    df_ExtraTrees = ExtraTreesClassification(data_x_transformed, data_y, folds)
+
+    # Merge df
+    df = pd.concat([df_SVM, df_ExtraTrees], axis=1)
+    df = df.rename(index={
+        0: "4 fold_accuracy",
+        1: "4 fold_precision",
+        2: "4 fold_specificity",
+        3: "4 fold_recall",
+        4: "4 fold_err_rate",
+        5: "5 fold_accuracy",
+        6: "5 fold_precision",
+        7: "5 fold_specificity",
+        8: "5 fold_recall",
+        9: "5 fold_err_rate",
+        10: "10 fold_accuracy",
+        11: "10 fold_precision",
+        12: "10 fold_specificity",
+        13: "10 fold_recall",
+        14: "10 fold_err_rate"
+    })
+
+    # Export to excel
+    # with pd.ExcelWriter("result.xlsx") as writer:
+    df.to_excel(writer, sheet_name="iterasi " + str(i+1))
+
+writer.save()

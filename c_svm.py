@@ -51,6 +51,7 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/
                 disp.plot(cmap='Blues')
                 # plt.show()
                 plt.savefig(output_graph + kernel + "_" + str(n_splits) + " folds_" + str(i) + ".png")
+                plt.clf()
 
             # Average Evaluation
             avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)

@@ -27,7 +27,7 @@ def ExtraTreesClassification(data_x, data_y, folds, output_graph = "graph/Extra-
 
         for i, (train_index, test_index) in enumerate(kfold.split(data_x)):
             # classification
-            classification = ExtraTreesClassifier(random_state=0)
+            classification = ExtraTreesClassifier()
             model = classification.fit(
                 data_x.iloc[train_index, :], data_y.iloc[train_index])
             ypred = classification.predict(data_x.iloc[test_index, :])
@@ -49,6 +49,7 @@ def ExtraTreesClassification(data_x, data_y, folds, output_graph = "graph/Extra-
             disp.plot(cmap='Blues')
             # plt.show()
             plt.savefig(output_graph + str(n_splits) + " folds_" + str(i) + ".png")
+            plt.clf()
 
         # Average Evaluation
         avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)
