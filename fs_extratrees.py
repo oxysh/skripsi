@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import time
 
 
-def ExtraTreesFeatureSelection(data_x, data_y, output_graph = "graph/") :
+def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     if not os.path.isdir(output_graph):
         os.makedirs(output_graph)
 
@@ -28,7 +28,11 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph = "graph/") :
     feature = SelectFromModel(extraTrees, threshold=0.1, max_features=max_features)
     feature.fit(data_x, data_y)
     idx = feature.get_support()
-    print("feature:", data_x.columns[idx])
+    print("feature: ", end="")
+    for i in range(len(idx)):
+        if idx[i] == True:
+            print(data_x.columns[i], end=", ")
+    print(".".rstrip(", "))
 
     data_x_transformed = pd.DataFrame(feature.transform(data_x))
 

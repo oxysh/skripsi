@@ -8,15 +8,23 @@ import sklearn.metrics as matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
-def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/") :  
+
+def SVMClassification(data_x, data_y, folds, kernels, output_graph="graph/SVM/"):
     result = []
-    
+
     if not os.path.isdir(output_graph):
         os.makedirs(output_graph)
 
     for kernel in kernels:
-        subresult = []
-        colnames = []
+        colnames = [
+            "Fold",
+            "Algoritma",
+            "Accuracy",
+            "Precision",
+            "Specificity",
+            "Recall",
+            "Error",
+        ]
         for n_splits in folds:
             kfold = KFold(n_splits=n_splits, shuffle=True)
 
@@ -26,6 +34,7 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/
             specificity = []
             recall = []
             err_rate = []
+            record = []
 
             for i, (train_index, test_index) in enumerate(kfold.split(data_x)):
                 # classification -> SVM
@@ -41,16 +50,28 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/
                 precision.append(matrix.precision_score(data_y.iloc[test_index], ypred))
                 recall.append(matrix.recall_score(data_y.iloc[test_index], ypred))
                 specificity.append(cm[0][0] / (cm[0][0] + cm[0][1]))
-                err_rate.append(1 - matrix.accuracy_score(data_y.iloc[test_index], ypred))
+                err_rate.append(
+                    1 - matrix.accuracy_score(data_y.iloc[test_index], ypred)
+                )
 
                 # plot the confmat
                 indices = np.argsort(cm.sum(axis=1))[::-1]
                 cm_sorted = cm[indices, :][:, indices]
-                labels_sorted = ['Positif', 'Negatif']
-                disp = ConfusionMatrixDisplay(confusion_matrix=cm_sorted, display_labels=labels_sorted)
-                disp.plot(cmap='Blues')
+                labels_sorted = ["Positif", "Negatif"]
+                disp = ConfusionMatrixDisplay(
+                    confusion_matrix=cm_sorted, display_labels=labels_sorted
+                )
+                disp.plot(cmap="Blues")
                 # plt.show()
-                plt.savefig(output_graph + kernel + "_" + str(n_splits) + " folds_" + str(i) + ".png")
+                plt.savefig(
+                    output_graph
+                    + kernel
+                    + "_"
+                    + str(n_splits)
+                    + " folds_"
+                    + str(i)
+                    + ".png"
+                )
                 plt.clf()
 
             # Average Evaluation
@@ -60,7 +81,13 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/
             avg_recall = round(sum(recall) / len(recall) * 100, 2)
             avg_err_rate = round(sum(err_rate) / len(err_rate) * 100, 2)
 
-            print("Selesai running SVM kernel " + kernel + " dengan " + str(n_splits) + " folds")
+            print(
+                "Selesai running SVM kernel "
+                + kernel
+                + " dengan "
+                + str(n_splits)
+                + " folds"
+            )
             # print("\nRata-rata -- SVM kernel " + kernel + " dengan " + str(n_splits) + " folds:")
             # print("Accuracy =", avg_accuracy, "%")
             # print("Precision =", avg_precision, "%")
@@ -68,14 +95,15 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph = "graph/SVM/
             # print("Recall =", avg_recall, "%")
             # print("Error rate =", avg_err_rate, "%")
 
-            subresult.append(avg_accuracy)
-            subresult.append(avg_precision)
-            subresult.append(avg_specificity)
-            subresult.append(avg_recall)
-            subresult.append(avg_err_rate)
-        result.append(subresult)
-        colnames.append("svm_" + kernel)
+            record.append(str(n_splits))
+            record.append("SVM kernel " + kernel)
+            record.append(avg_accuracy)
+            record.append(avg_precision)
+            record.append(avg_specificity)
+            record.append(avg_recall)
+            record.append(avg_err_rate)
 
-    result = np.transpose(result)
-    df = pd.DataFrame(result, columns=kernels)
+            result.append(record)
+
+    df = pd.DataFrame(result, columns=colnames)
     return df
