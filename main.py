@@ -51,16 +51,17 @@ folds = [4, 5, 10]
 # SVM Kernel
 kernels = ["linear", "poly", "rbf", "sigmoid"]
 
-writer = pd.ExcelWriter("result.xlsx")
 result = pd.DataFrame()
 for i in range(5):
     print("\n--- Iterasi " + str(i + 1) + " ---")
 
+    output_graph="graph/iterasi "+ str(i+1) +"/"
+
     # SVM
-    df_SVM = SVMClassification(data_x_transformed, data_y, folds, kernels)
+    df_SVM = SVMClassification(data_x_transformed, data_y, folds, kernels, output_graph+"SVM/")
 
     # Extra-Trees
-    df_ExtraTrees = ExtraTreesClassification(data_x_transformed, data_y, folds)
+    df_ExtraTrees = ExtraTreesClassification(data_x_transformed, data_y, folds, output_graph+"Extra-trees/")
 
     # Merge df
     # df = df_SVM.append(df_ExtraTrees, ignore_index=True)
@@ -72,7 +73,10 @@ for i in range(5):
     result = pd.concat([result, df])
 
 # Export to excel
-# with pd.ExcelWriter("result.xlsx") as writer:
+writer = pd.ExcelWriter("result.xlsx")
 result.to_excel(writer, sheet_name="main")
+
+# REVISIT:
+# need to count evaluation mean of ever fold+classification automatically in python
 
 writer.close()
