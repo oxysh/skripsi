@@ -72,7 +72,7 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph="graph/SVM/")
                     + str(i)
                     + ".png"
                 )
-                plt.clf()
+                plt.close()
 
             # Average Evaluation
             avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)

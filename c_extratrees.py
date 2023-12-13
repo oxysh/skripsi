@@ -63,7 +63,7 @@ def ExtraTreesClassification(data_x, data_y, folds, output_graph="graph/Extra-tr
             disp.plot(cmap="Blues")
             # plt.show()
             plt.savefig(output_graph + str(n_splits) + " folds_" + str(i) + ".png")
-            plt.clf()
+            plt.close()
 
         # Average Evaluation
         avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)

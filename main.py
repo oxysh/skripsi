@@ -53,7 +53,7 @@ kernels = ["linear", "poly", "rbf", "sigmoid"]
 
 writer = pd.ExcelWriter("result.xlsx")
 result = pd.DataFrame()
-for i in range(2):
+for i in range(5):
     print("\n--- Iterasi " + str(i + 1) + " ---")
 
     # SVM
@@ -75,4 +75,4 @@ for i in range(2):
 # with pd.ExcelWriter("result.xlsx") as writer:
 result.to_excel(writer, sheet_name="main")
 
-writer.save()
+writer.close()
