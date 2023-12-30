@@ -37,7 +37,7 @@ data["Progesterone Status"].replace({"Positive": 1, "Negative": 0}, inplace=True
 data["Status"].replace({"Alive": 1, "Dead": 0}, inplace=True)
 
 data = pd.get_dummies(
-    data, columns=["Race", "Marital Status"], dtype=int, drop_first=True
+    data, columns=["Race", "Marital Status"], dtype=int
 )
 
 data_x = data.drop(["Status"], axis=1)
@@ -49,6 +49,7 @@ data_x, data_y = smote.fit_resample(data_x, data_y)
 
 # Feature selection
 data_x_transformed = ExtraTreesFeatureSelection(data_x, data_y)
+# data_x_transformed = data_x
 
 # KFold
 folds = [4, 5, 10]
@@ -57,7 +58,7 @@ folds = [4, 5, 10]
 kernels = ["linear", "poly", "rbf", "sigmoid"]
 
 result = pd.DataFrame()
-for i in range(5):
+for i in range(1):
     print("\n--- Iterasi " + str(i + 1) + " ---")
 
     output_graph="graph/iterasi "+ str(i+1) +"/"

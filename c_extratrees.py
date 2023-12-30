@@ -82,7 +82,6 @@ def ExtraTreesClassification(data_x, data_y, folds, output_graph="graph/Extra-tr
                 for k in range(len(confmat)):
                     sum_confmat = sum_confmat + confmat[k][j][i]
                 avg_confmat[j][i] = round(sum_confmat / len(confmat), 0)
-        print(avg_confmat)
         
         indices = np.argsort(avg_confmat.sum(axis=1))[::-1]
         cm_sorted = avg_confmat[indices, :][:, indices]

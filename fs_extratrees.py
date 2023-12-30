@@ -25,14 +25,15 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     # plt.show()
     plt.savefig(output_graph + "feature_importances.png")
 
-    feature = SelectFromModel(extraTrees, threshold=0.1, max_features=max_features)
+    feature = SelectFromModel(extraTrees, max_features=max_features)
     feature.fit(data_x, data_y)
     idx = feature.get_support()
-    print("feature: ", end="")
+    print("", end="")
+    x = 'feature: '
     for i in range(len(idx)):
         if idx[i] == True:
-            print(data_x.columns[i], end=", ")
-    print(".".rstrip(", "))
+            x = x + data_x.columns[i]
+    x = x[0:-2] + '.'
 
     data_x_transformed = pd.DataFrame(feature.transform(data_x))
 
