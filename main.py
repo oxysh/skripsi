@@ -1,5 +1,6 @@
 # Import libraries
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 from fs_extratrees import ExtraTreesFeatureSelection
 from c_svm import SVMClassification
 from c_extratrees import ExtraTreesClassification
@@ -41,6 +42,10 @@ data = pd.get_dummies(
 
 data_x = data.drop(["Status"], axis=1)
 data_y = data["Status"]
+
+# handling imbalance
+smote = SMOTE(random_state=1)
+data_x, data_y = smote.fit_resample(data_x, data_y)
 
 # Feature selection
 data_x_transformed = ExtraTreesFeatureSelection(data_x, data_y)
