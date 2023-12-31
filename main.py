@@ -50,7 +50,7 @@ def createStatusPlot(data_y, title, filename) :
     data_y0 = np.count_nonzero(data_y.to_numpy() == 0)
     data_y1 = np.count_nonzero(data_y.to_numpy() == 1)
 
-    fig, ax = plt.subplots(figsize=(5, 6))
+    fig, ax = plt.subplots(figsize=(6, 7))
     rects = ax.bar(
         ['Dead', 'Alive'], 
         [data_y0, data_y1], 

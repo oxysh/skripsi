@@ -21,8 +21,11 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     # print("feature importance", extraTrees.feature_importances_)
     # print("feature importance", extraTrees.get_support())
     # show bar - feature importances
+    plt.figure(figsize=(18, 8))
     plt.barh(data_x.columns, extraTrees.feature_importances_, color="#18ACA4")
-    # plt.show()
+    plt.xlabel('Feature importances')
+    plt.ylabel('Atribut')
+    plt.title('Feature importances dari setiap atribut')
     plt.savefig(output_graph + "feature_importances.png")
 
     feature = SelectFromModel(extraTrees, max_features=max_features)
