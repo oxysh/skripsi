@@ -1,5 +1,7 @@
 # Import libraries
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from fs_extratrees import ExtraTreesFeatureSelection
 from c_svm import SVMClassification
@@ -43,9 +45,45 @@ data = pd.get_dummies(
 data_x = data.drop(["Status"], axis=1)
 data_y = data["Status"]
 
+# plot about status
+def createStatusPlot(data_y, title, filename) :
+    data_y0 = np.count_nonzero(data_y.to_numpy() == 0)
+    data_y1 = np.count_nonzero(data_y.to_numpy() == 1)
+
+    fig, ax = plt.subplots(figsize=(5, 6))
+    rects = ax.bar(
+        ['Dead', 'Alive'], 
+        [data_y0, data_y1], 
+        color="#18ACA4", 
+        width=.4
+    )
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate(f"{int(height)}", xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3), textcoords="offset points", ha='center', va='bottom')
+    plt.xlabel('Status')
+    plt.ylabel('Jumlah')
+    plt.title(title)
+    plt.savefig(filename)
+    plt.close()
+
+# plot before handling-imbalance
+createStatusPlot(
+    data_y, 
+    'Jumlah subjek pada setiap kelas\nsebelum handling-imbalance',
+    'graph/handling-imbalance_before.png'
+)
+
 # handling imbalance
-smote = SMOTE(random_state=1)
+smote = SMOTE(random_state=42)
 data_x, data_y = smote.fit_resample(data_x, data_y)
+
+# plot after handling-imbalance
+createStatusPlot(
+    data_y, 
+    'Jumlah subjek pada setiap kelas\nsetelah handling-imbalance',
+    'graph/handling-imbalance_after.png'
+)
 
 # Feature selection
 data_x_transformed = ExtraTreesFeatureSelection(data_x, data_y)
