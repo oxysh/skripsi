@@ -3,9 +3,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
+import time
+import os
+from openpyxl import load_workbook
 from fs_extratrees import ExtraTreesFeatureSelection
 from c_svm import SVMClassification
 from c_extratrees import ExtraTreesClassification
+
+# save time start
+start_time = time.time()
 
 # Read data
 data = pd.read_excel("new-data.xlsx")
@@ -109,7 +115,7 @@ for i in range(1):
 
     # Merge df
     # df = df_SVM.append(df_ExtraTrees, ignore_index=True)
-    df = pd.concat([df_SVM, df_ExtraTrees])
+    df = pd.concat([df_SVM, df_ExtraTrees], ignore_index=True)
 
     # Iteration
     df["Iterasi"] = i + 1
@@ -117,10 +123,26 @@ for i in range(1):
     result = pd.concat([result, df])
 
 # Export to excel
-writer = pd.ExcelWriter("result.xlsx")
-result.to_excel(writer, sheet_name="main")
+# don't forget to change the sheet-name!!
+filename = 'result.xlsx'
+sheetname = 'imbalance; fs; svm c=3'
+if os.path.isfile(filename):
+    last_file = pd.ExcelFile(filename)
+    last_results = {}
+    for sheet in last_file.sheet_names:
+        last_results[sheet] = last_file.parse(sheet)
+    last_results[sheetname] = result
+    with pd.ExcelWriter(filename) as writer:
+        for sheet, last_result in last_results.items():
+            last_result.to_excel(writer, sheet_name=sheet, index=False)
+else:
+    with pd.ExcelWriter(filename) as writer:
+        result.to_excel(writer, sheet_name=sheetname, index=False)
 
 # REVISIT:
 # need to count evaluation mean of ever fold+classification automatically in python
 
-writer.close()
+
+
+# print running time
+print(f"--- runtime: {((time.time() - start_time)/60):.2f} minutes ---")
