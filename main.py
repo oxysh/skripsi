@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 import time
 import os
-from openpyxl import load_workbook
 from fs_extratrees import ExtraTreesFeatureSelection
 from c_svm import SVMClassification
 from c_extratrees import ExtraTreesClassification
@@ -102,46 +101,46 @@ folds = [4, 5, 10]
 kernels = ["linear", "poly", "rbf", "sigmoid"]
 c = [1, 3, 5]
 deg = [1, 3, 6]
-for c_value in c:
-    for deg_value in deg:
-        result = pd.DataFrame()
-        for i in range(1):
-            print("\n--- Iterasi " + str(i + 1) + " ---")
+result = pd.DataFrame()
+for i in range(1):
+    print("\n--- Iterasi " + str(i + 1) + " ---")
 
-            output_graph="graph/iterasi "+ str(i+1) +"/"
+    output_graph="graph/iterasi "+ str(i+1) +"/"
 
-            # SVM
-            df_SVM = SVMClassification(data_x_transformed, data_y, folds, kernels, c_value, deg_value, output_graph+"SVM/")
+    # SVM
+    for c_value in c:
+        for kernel in kernels:
+            if (kernel == 'poly'):
+                for deg_value in deg:
+                    df = SVMClassification(data_x_transformed, data_y, folds, kernel, c_value, deg_value, output_graph+"SVM/")
+            else:
+                df = SVMClassification(data_x_transformed, data_y, folds, kernel, c_value, 3, output_graph+"SVM/")
+                
+                df["Iterasi"] = i + 1
+                result = pd.concat([result, df], ignore_index=True)
 
-            # Extra-Trees
-            df_ExtraTrees = ExtraTreesClassification(data_x_transformed, data_y, folds, output_graph+"Extra-trees/")
+    # Extra-Trees
+    df = ExtraTreesClassification(data_x_transformed, data_y, folds, output_graph+"Extra-trees/")
+    df["Iterasi"] = i + 1
+    result = pd.concat([result, df], ignore_index=True)
 
-            # Merge df
-            # df = df_SVM.append(df_ExtraTrees, ignore_index=True)
-            df = pd.concat([df_SVM, df_ExtraTrees], ignore_index=True)
-
-            # Iteration
-            df["Iterasi"] = i + 1
-
-            result = pd.concat([result, df])
-
-        # Export to excel
-        # don't forget to change the sheet-name!!
-        filename = 'result.xlsx'
-        sheetname = 'imb; fs; svm c='+str(c_value)+'; poly_deg='+str(deg_value)+''
-        if os.path.isfile(filename):
-            last_file = pd.ExcelFile(filename)
-            last_results = {}
-            for sheet in last_file.sheet_names:
-                last_results[sheet] = last_file.parse(sheet)
-            last_results[sheetname] = result
-            with pd.ExcelWriter(filename) as writer:
-                for sheet, last_result in last_results.items():
-                    last_result.to_excel(writer, sheet_name=sheet, index=False)
-        else:
-            writer = pd.ExcelWriter(filename)
-            result.to_excel(writer, sheet_name=sheetname)
-            writer.close()
+# Export to excel
+# don't forget to change the sheet-name!!
+filename = 'result.xlsx'
+sheetname = 'imb; fs'
+if os.path.isfile(filename):
+    last_file = pd.ExcelFile(filename)
+    last_results = {}
+    for sheet in last_file.sheet_names:
+        last_results[sheet] = last_file.parse(sheet)
+    last_results[sheetname] = result
+    with pd.ExcelWriter(filename) as writer:
+        for sheet, last_result in last_results.items():
+            last_result.to_excel(writer, sheet_name=sheet, index=False)
+else:
+    writer = pd.ExcelWriter(filename)
+    result.to_excel(writer, sheet_name=sheetname, index=False)
+    writer.close()
 
 # REVISIT:
 # need to count evaluation mean of ever fold+classification automatically in python

@@ -9,7 +9,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 
-def SVMClassification(data_x, data_y, folds, kernels, c=1, deg=3, output_graph="graph/SVM/"):
+def SVMClassification(data_x, data_y, folds, kernel, c=1, deg=3, output_graph="graph/SVM/"):
     result = []
 
     if not os.path.isdir(output_graph):
@@ -18,82 +18,48 @@ def SVMClassification(data_x, data_y, folds, kernels, c=1, deg=3, output_graph="
     if not os.path.isdir(output_graph+"/average/"):
         os.makedirs(output_graph+"/average/")
 
-    for kernel in kernels:
-        colnames = [
-            "Fold",
-            "Algoritma",
-            "Accuracy",
-            "Precision",
-            "Specificity",
-            "Recall",
-            "Error",
-        ]
-        for n_splits in folds:
-            kfold = KFold(n_splits=n_splits, shuffle=True)
+    # for kernel in kernels:
+    colnames = [
+        "Fold",
+        "Algoritma",
+        "Accuracy",
+        "Precision",
+        "Specificity",
+        "Recall",
+        "Error",
+    ]
+    for n_splits in folds:
+        kfold = KFold(n_splits=n_splits, shuffle=True)
 
-            confmat = []
-            accuracy = []
-            precision = []
-            specificity = []
-            recall = []
-            err_rate = []
-            record = []
+        confmat = []
+        accuracy = []
+        precision = []
+        specificity = []
+        recall = []
+        err_rate = []
+        record = []
 
-            for i, (train_index, test_index) in enumerate(kfold.split(data_x)):
-                # classification -> SVM
-                # C=5 -> akurasi yg lbih tinggi; margin lbih kecil. C=1 -> akurasi lbih rendah; margin lbih besar
-                svm = SVC(kernel=kernel, C=c, degree=deg)
-                model = svm.fit(data_x.iloc[train_index, :], data_y.iloc[train_index])
-                ypred = svm.predict(data_x.iloc[test_index, :])
+        for i, (train_index, test_index) in enumerate(kfold.split(data_x)):
+            # classification -> SVM
+            # C=5 -> akurasi yg lbih tinggi; margin lbih kecil. C=1 -> akurasi lbih rendah; margin lbih besar
+            svm = SVC(kernel=kernel, C=c, degree=deg)
+            model = svm.fit(data_x.iloc[train_index, :], data_y.iloc[train_index])
+            ypred = svm.predict(data_x.iloc[test_index, :])
 
-                # evaluation
-                cm = np.array(matrix.confusion_matrix(data_y.iloc[test_index], ypred))
-                confmat.append(cm.tolist())
-                accuracy.append(matrix.accuracy_score(data_y.iloc[test_index], ypred))
-                precision.append(matrix.precision_score(data_y.iloc[test_index], ypred))
-                recall.append(matrix.recall_score(data_y.iloc[test_index], ypred))
-                specificity.append(cm[0][0] / (cm[0][0] + cm[0][1]))
-                err_rate.append(
-                    1 - matrix.accuracy_score(data_y.iloc[test_index], ypred)
-                )
+            # evaluation
+            cm = np.array(matrix.confusion_matrix(data_y.iloc[test_index], ypred))
+            confmat.append(cm.tolist())
+            accuracy.append(matrix.accuracy_score(data_y.iloc[test_index], ypred))
+            precision.append(matrix.precision_score(data_y.iloc[test_index], ypred))
+            recall.append(matrix.recall_score(data_y.iloc[test_index], ypred))
+            specificity.append(cm[0][0] / (cm[0][0] + cm[0][1]))
+            err_rate.append(
+                1 - matrix.accuracy_score(data_y.iloc[test_index], ypred)
+            )
 
-                # plot the confmat
-                indices = np.argsort(cm.sum(axis=1))[::-1]
-                cm_sorted = cm[indices, :][:, indices]
-                labels_sorted = ["Positif", "Negatif"]
-                disp = ConfusionMatrixDisplay(
-                    confusion_matrix=cm_sorted, display_labels=labels_sorted
-                )
-                disp.plot(cmap="Blues")
-                # plt.show()
-                plt.savefig(
-                    output_graph
-                    + kernel
-                    + "_"
-                    + str(n_splits)
-                    + " folds_"
-                    + str(i)
-                    + ".png"
-                )
-                plt.close()
-
-            # Average Evaluation
-            avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)
-            avg_precision = round(sum(precision) / len(precision) * 100, 2)
-            avg_specificity = round(sum(specificity) / len(specificity) * 100, 2)
-            avg_recall = round(sum(recall) / len(recall) * 100, 2)
-            avg_err_rate = round(sum(err_rate) / len(err_rate) * 100, 2)
-            
-            avg_confmat = np.empty((2,2), int)
-            for i in range(2):
-                for j in range(2):
-                    sum_confmat = 0
-                    for k in range(len(confmat)):
-                        sum_confmat = sum_confmat + confmat[k][j][i]
-                    avg_confmat[j][i] = round(sum_confmat / len(confmat), 0)
-            
-            indices = np.argsort(avg_confmat.sum(axis=1))[::-1]
-            cm_sorted = avg_confmat[indices, :][:, indices]
+            # plot the confmat
+            indices = np.argsort(cm.sum(axis=1))[::-1]
+            cm_sorted = cm[indices, :][:, indices]
             labels_sorted = ["Positif", "Negatif"]
             disp = ConfusionMatrixDisplay(
                 confusion_matrix=cm_sorted, display_labels=labels_sorted
@@ -101,7 +67,7 @@ def SVMClassification(data_x, data_y, folds, kernels, c=1, deg=3, output_graph="
             disp.plot(cmap="Blues")
             # plt.show()
             plt.savefig(
-                output_graph + '/average/'
+                output_graph
                 + kernel
                 + "_"
                 + str(n_splits)
@@ -111,29 +77,66 @@ def SVMClassification(data_x, data_y, folds, kernels, c=1, deg=3, output_graph="
             )
             plt.close()
 
-            print(
-                "Selesai running SVM kernel "
-                + kernel
-                + " dengan "
-                + str(n_splits)
-                + " folds"
-            )
-            # print("\nRata-rata -- SVM kernel " + kernel + " dengan " + str(n_splits) + " folds:")
-            # print("Accuracy =", avg_accuracy, "%")
-            # print("Precision =", avg_precision, "%")
-            # print("Specificity =", avg_specificity, "%")
-            # print("Recall =", avg_recall, "%")
-            # print("Error rate =", avg_err_rate, "%")
+        # Average Evaluation
+        avg_accuracy = round(sum(accuracy) / len(accuracy) * 100, 2)
+        avg_precision = round(sum(precision) / len(precision) * 100, 2)
+        avg_specificity = round(sum(specificity) / len(specificity) * 100, 2)
+        avg_recall = round(sum(recall) / len(recall) * 100, 2)
+        avg_err_rate = round(sum(err_rate) / len(err_rate) * 100, 2)
+        
+        avg_confmat = np.empty((2,2), int)
+        for i in range(2):
+            for j in range(2):
+                sum_confmat = 0
+                for k in range(len(confmat)):
+                    sum_confmat = sum_confmat + confmat[k][j][i]
+                avg_confmat[j][i] = round(sum_confmat / len(confmat), 0)
+        
+        indices = np.argsort(avg_confmat.sum(axis=1))[::-1]
+        cm_sorted = avg_confmat[indices, :][:, indices]
+        labels_sorted = ["Positif", "Negatif"]
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=cm_sorted, display_labels=labels_sorted
+        )
+        disp.plot(cmap="Blues")
+        # plt.show()
+        plt.savefig(
+            output_graph + '/average/'
+            + kernel
+            + "_"
+            + str(n_splits)
+            + " folds_"
+            + str(i)
+            + ".png"
+        )
+        plt.close()
 
-            record.append(str(n_splits))
-            record.append("SVM kernel " + kernel)
-            record.append(avg_accuracy)
-            record.append(avg_precision)
-            record.append(avg_specificity)
-            record.append(avg_recall)
-            record.append(avg_err_rate)
+        print(
+            "Selesai running SVM kernel "
+            + kernel
+            + " dengan "
+            + str(n_splits)
+            + " folds"
+        )
+        # print("\nRata-rata -- SVM kernel " + kernel + " dengan " + str(n_splits) + " folds:")
+        # print("Accuracy =", avg_accuracy, "%")
+        # print("Precision =", avg_precision, "%")
+        # print("Specificity =", avg_specificity, "%")
+        # print("Recall =", avg_recall, "%")
+        # print("Error rate =", avg_err_rate, "%")
 
-            result.append(record)
+        record.append(str(n_splits))
+        if (kernel == 'poly') :
+            record.append("SVM C="+str(c)+" kernel " + kernel + " deg="+str(deg))
+        else:
+            record.append("SVM C="+str(c)+" kernel " + kernel)
+        record.append(avg_accuracy)
+        record.append(avg_precision)
+        record.append(avg_specificity)
+        record.append(avg_recall)
+        record.append(avg_err_rate)
+
+        result.append(record)
 
     df = pd.DataFrame(result, columns=colnames)
     return df
