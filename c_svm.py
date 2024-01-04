@@ -29,6 +29,9 @@ def SVMClassification(data_x, data_y, folds, kernel, c=1, deg=3, output_graph="g
         "Error",
     ]
     for n_splits in folds:
+        title_default = "SVM C="+str(c)+" kernel " + kernel
+        title_poly = "SVM C="+str(c)+" kernel " + kernel + " deg="+str(deg)
+
         kfold = KFold(n_splits=n_splits, shuffle=True)
 
         confmat = []
@@ -75,6 +78,26 @@ def SVMClassification(data_x, data_y, folds, kernel, c=1, deg=3, output_graph="g
                 + str(i)
                 + ".png"
             )
+            if (kernel == 'poly') :
+                plt.savefig(
+                    output_graph
+                    + title_poly
+                    + "_"
+                    + str(n_splits)
+                    + " folds_"
+                    + str(i)
+                    + ".png"
+                )
+            else:
+                plt.savefig(
+                    output_graph
+                    + title_default
+                    + "_"
+                    + str(n_splits)
+                    + " folds_"
+                    + str(i)
+                    + ".png"
+                )
             plt.close()
 
         # Average Evaluation
@@ -100,24 +123,32 @@ def SVMClassification(data_x, data_y, folds, kernel, c=1, deg=3, output_graph="g
         )
         disp.plot(cmap="Blues")
         # plt.show()
-        plt.savefig(
-            output_graph + '/average/'
-            + kernel
-            + "_"
-            + str(n_splits)
-            + " folds_"
-            + str(i)
-            + ".png"
-        )
+        if (kernel == 'poly') :
+            plt.savefig(
+                output_graph + '/average/'
+                + title_poly
+                + "_"
+                + str(n_splits)
+                + " folds_"
+                + str(i)
+                + ".png"
+            )
+        else:
+            plt.savefig(
+                output_graph + '/average/'
+                + title_default
+                + "_"
+                + str(n_splits)
+                + " folds_"
+                + str(i)
+                + ".png"
+            )
         plt.close()
 
-        print(
-            "Selesai running SVM kernel "
-            + kernel
-            + " dengan "
-            + str(n_splits)
-            + " folds"
-        )
+        if (kernel == 'poly') :
+            print(title_poly + " dengan " + str(n_splits) + " folds")
+        else:
+            print(title_default + " dengan " + str(n_splits) + " folds")
         # print("\nRata-rata -- SVM kernel " + kernel + " dengan " + str(n_splits) + " folds:")
         # print("Accuracy =", avg_accuracy, "%")
         # print("Precision =", avg_precision, "%")
@@ -127,9 +158,9 @@ def SVMClassification(data_x, data_y, folds, kernel, c=1, deg=3, output_graph="g
 
         record.append(str(n_splits))
         if (kernel == 'poly') :
-            record.append("SVM C="+str(c)+" kernel " + kernel + " deg="+str(deg))
+            record.append(title_poly)
         else:
-            record.append("SVM C="+str(c)+" kernel " + kernel)
+            record.append(title_default)
         record.append(avg_accuracy)
         record.append(avg_precision)
         record.append(avg_specificity)
