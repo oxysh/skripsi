@@ -113,9 +113,10 @@ for i in range(1):
             if (kernel == 'poly'):
                 for deg_value in deg:
                     df = SVMClassification(data_x_transformed, data_y, folds, kernel, c_value, deg_value, output_graph+"SVM/")
+                    df["Iterasi"] = i + 1
+                    result = pd.concat([result, df], ignore_index=True)
             else:
                 df = SVMClassification(data_x_transformed, data_y, folds, kernel, c_value, 3, output_graph+"SVM/")
-                
                 df["Iterasi"] = i + 1
                 result = pd.concat([result, df], ignore_index=True)
 
