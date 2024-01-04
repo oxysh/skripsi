@@ -9,7 +9,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 
-def SVMClassification(data_x, data_y, folds, kernels, output_graph="graph/SVM/"):
+def SVMClassification(data_x, data_y, folds, kernels, c=1, deg=3, output_graph="graph/SVM/"):
     result = []
 
     if not os.path.isdir(output_graph):
@@ -42,7 +42,7 @@ def SVMClassification(data_x, data_y, folds, kernels, output_graph="graph/SVM/")
             for i, (train_index, test_index) in enumerate(kfold.split(data_x)):
                 # classification -> SVM
                 # C=5 -> akurasi yg lbih tinggi; margin lbih kecil. C=1 -> akurasi lbih rendah; margin lbih besar
-                svm = SVC(kernel=kernel, C=5)
+                svm = SVC(kernel=kernel, C=c, degree=deg)
                 model = svm.fit(data_x.iloc[train_index, :], data_y.iloc[train_index])
                 ypred = svm.predict(data_x.iloc[test_index, :])
 
