@@ -12,7 +12,7 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     if not os.path.isdir(output_graph):
         os.makedirs(output_graph)
 
-    max_features = int(np.sqrt(data_x.shape[1]))
+    max_features = int(round(np.sqrt(data_x.shape[1])))
     print("Jumlah fitur yang digunakan:", max_features)
     extraTrees = ExtraTreesClassifier(
         n_estimators=150, random_state=0, max_features=max_features
@@ -21,18 +21,22 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     # print("feature importance", extraTrees.feature_importances_)
     # print("feature importance", extraTrees.get_support())
     # show bar - feature importances
+    plt.figure(figsize=(18, 8))
     plt.barh(data_x.columns, extraTrees.feature_importances_, color="#18ACA4")
-    # plt.show()
+    plt.xlabel('Feature importances')
+    plt.ylabel('Atribut')
+    plt.title('Feature importances dari setiap atribut')
     plt.savefig(output_graph + "feature_importances.png")
 
-    feature = SelectFromModel(extraTrees, threshold=0.1, max_features=max_features)
+    feature = SelectFromModel(extraTrees, max_features=max_features)
     feature.fit(data_x, data_y)
     idx = feature.get_support()
-    print("feature: ", end="")
+    x = 'feature: '
     for i in range(len(idx)):
         if idx[i] == True:
-            print(data_x.columns[i], end=", ")
-    print(".".rstrip(", "))
+            x = x + data_x.columns[i] + ', '
+    x = x[0:-2] + '.'
+    print(x)
 
     data_x_transformed = pd.DataFrame(feature.transform(data_x))
 
