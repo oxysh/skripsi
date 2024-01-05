@@ -102,7 +102,7 @@ kernels = ["linear", "poly", "rbf", "sigmoid"]
 c = [1, 3, 5]
 deg = [1, 3, 6]
 result = pd.DataFrame()
-for i in range(1):
+for i in range(5):
     print("\n--- Iterasi " + str(i + 1) + " ---")
 
     output_graph="graph/iterasi "+ str(i+1) +"/"
