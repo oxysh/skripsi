@@ -23,19 +23,19 @@ def ExtraTreesFeatureSelection(data_x, data_y, output_graph="graph/"):
     # show bar - feature importances
     plt.figure(figsize=(18, 8))
     plt.barh(data_x.columns, extraTrees.feature_importances_, color="#18ACA4")
-    plt.xlabel('Feature importances')
-    plt.ylabel('Atribut')
-    plt.title('Feature importances dari setiap atribut')
+    plt.xlabel("Feature importances")
+    plt.ylabel("Atribut")
+    plt.title("Feature importances dari setiap atribut")
     plt.savefig(output_graph + "feature_importances.png")
 
     feature = SelectFromModel(extraTrees, max_features=max_features)
     feature.fit(data_x, data_y)
     idx = feature.get_support()
-    x = 'feature: '
+    x = "feature: "
     for i in range(len(idx)):
         if idx[i] == True:
-            x = x + data_x.columns[i] + ', '
-    x = x[0:-2] + '.'
+            x = x + data_x.columns[i] + ", "
+    x = x[0:-2] + "."
     print(x)
 
     data_x_transformed = pd.DataFrame(feature.transform(data_x))
